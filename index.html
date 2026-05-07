@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#000000">
+<script>
+  if('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js');
+  }
+</script><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>CAIXA</title>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<style>
+:root{--azul:#003366;--azulE:#001a33;--azulC:#0d4a80;--azulClaro:#e3edf7;--laranja:#F7941D;--laranjaH:#e08610;--bg:#E8EBEF;--branco:#fff;--txt:#111;--txtL:#555;--verde:#2ecc40;--vermelho:#e74c3c;--borda:#d0d0d0;--safe:env(safe-area-inset-bottom,0px)}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:'Montserrat',sans-serif;background:#000;display:flex;justify-content:center;align-items:center;min-height:100vh;overflow:hidden}
+.app{width:100%;max-width:430px;height:100vh;max-height:932px;position:relative;overflow:hidden;background:var(--bg)}
+@media(min-width:431px){.app{border-radius:20px;height:92vh;box-shadow:0 0 80px rgba(0,0,0,.6)}}
+
+.login{position:absolute;inset:0;z-index:100;display:flex;flex-direction:column}
+.loginBg{position:absolute;inset:0;background:linear-gradient(160deg,var(--azul) 0%,var(--azulE) 60%,#000d1a 100%);overflow:hidden}
+.loginBg::before{content:'';position:absolute;width:250%;height:250%;top:-75%;left:-75%;background:radial-gradient(ellipse at 35% 25%,rgba(247,148,29,.12) 0%,transparent 50%),radial-gradient(ellipse at 65% 75%,rgba(13,74,128,.2) 0%,transparent 50%);animation:bgM 10s ease-in-out infinite alternate}
+@keyframes bgM{to{transform:rotate(3deg) scale(1.02)}}
+.loginFig{position:absolute;bottom:10%;right:-8%;width:300px;height:350px;opacity:.08}
+.loginFit{position:absolute;top:8%;right:8%;width:180px;height:260px;opacity:.06;animation:rF 7s ease-in-out infinite}
+@keyframes rF{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-12px) rotate(2deg)}}
+.loginC{position:relative;z-index:2;flex:1;display:flex;flex-direction:column;padding:48px 22px 16px;overflow:hidden}
+.loginX{position:absolute;top:14px;right:14px;width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.08);border:none;color:#fff;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:5}
+.loginLogo{margin-bottom:32px}
+.loginLogo svg{width:110px;height:36px}
+.loginGreet{color:#fff;font-size:18px;font-weight:500;line-height:1.35;margin-bottom:10px}
+.loginCpfBox{margin-bottom:16px}
+.loginCpfL{color:rgba(255,255,255,.5);font-size:10px;text-transform:uppercase;letter-spacing:1px;margin-bottom:3px}
+.loginCpfRow{display:flex;align-items:center;gap:8px}
+.loginCpfV{color:#fff;font-size:15px;font-weight:600;letter-spacing:.8px;flex:1}
+.loginCpfArrow{color:rgba(255,255,255,.4);font-size:13px;cursor:pointer;padding:6px;border-radius:50%;background:rgba(255,255,255,.06);border:none;display:flex;align-items:center;justify-content:center;width:30px;height:30px}
+.loginSelU{color:var(--laranja);font-size:11px;font-weight:600;margin-bottom:16px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:5px;background:rgba(247,148,29,.1);padding:7px 14px;border-radius:6px}
+.loginSelU i{font-size:10px}
+.cpfDropdown{position:absolute;top:0;left:0;right:0;bottom:0;z-index:10;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s}
+.cpfDropdown.on{opacity:1;pointer-events:all}
+.cpfDropCard{background:#fff;border-radius:14px;width:85%;max-width:340px;overflow:hidden;transform:scale(.9);transition:transform .25s}
+.cpfDropdown.on .cpfDropCard{transform:scale(1)}
+.cpfDropHead{background:var(--azul);padding:16px;color:#fff;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:space-between}
+.cpfDropClose{background:rgba(255,255,255,.1);border:none;color:#fff;width:28px;height:28px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px}
+.cpfDropList{padding:6px 0}
+.cpfDropItem{padding:14px 18px;display:flex;align-items:center;gap:12px;cursor:pointer;border:none;background:none;width:100%;text-align:left;font-family:'Montserrat',sans-serif}
+.cpfDropItem:active{background:#f0f0f0}
+.cpfDropItem.sel{background:rgba(247,148,29,.06)}
+.cpfDropItem.sel::after{content:'\f00c';font-family:'Font Awesome 6 Free';font-weight:900;color:var(--laranja);margin-left:auto;font-size:13px}
+.cpfDropAvatar{width:36px;height:36px;border-radius:50%;background:var(--azul);color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0}
+.cpfDropInfo{flex:1;min-width:0}
+.cpfDropName{font-size:13px;font-weight:600;color:var(--txt)}
+.cpfDropCpf{font-size:11px;color:var(--txtL);margin-top:1px}
+.loginBio{width:100%;padding:13px;border-radius:8px;background:var(--laranja);border:none;color:#fff;font-family:'Montserrat',sans-serif;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:14px}
+.loginBio:active{transform:scale(.98)}
+.pinDots{display:flex;gap:11px;justify-content:center;margin-bottom:6px;height:14px}
+.pinD{width:13px;height:13px;border-radius:50%;border:2px solid rgba(255,255,255,.35);transition:all .15s}
+.pinD.on{background:#fff;border-color:#fff;animation:pPop .2s ease}
+@keyframes pPop{0%{transform:scale(.4)}60%{transform:scale(1.2)}100%{transform:scale(1)}}
+.pinErr{animation:pShake .4s ease}
+@keyframes pShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-7px)}50%{transform:translateX(7px)}75%{transform:translateX(-5px)}}
+.loginErr{color:#ff6b6b;font-size:11px;text-align:center;min-height:16px;margin-top:4px}
+.kpWrap{margin-top:auto;padding-bottom:8px;flex-shrink:0}
+.kpLabel{color:rgba(255,255,255,.4);font-size:10px;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:10px}
+.kp{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;max-width:260px;margin:0 auto}
+.kb{height:50px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:#fff;font-family:'Montserrat',sans-serif;font-size:21px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.kb:active{background:rgba(255,255,255,.15);transform:scale(.95)}
+.kb.empty{visibility:hidden}
+.kb.bs{font-size:17px}
+
+.main{position:absolute;inset:0;display:flex;flex-direction:column;background:var(--bg);opacity:0;pointer-events:none;transition:opacity .4s}
+.main.on{opacity:1;pointer-events:all}
+.mTopBar{background:var(--azul);padding:10px 14px 0;flex-shrink:0}
+.mHTop{display:flex;align-items:center;justify-content:space-between;padding-bottom:8px}
+.mLogo{display:flex;align-items:center;gap:7px}
+.mLogoT{color:#fff;font-size:15px;font-weight:700;letter-spacing:.8px}
+.mHA{display:flex;gap:10px}
+.mHBtn{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.08);border:none;color:#fff;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;position:relative}
+.mHBtn:active{background:rgba(255,255,255,.18)}
+.nBadge{position:absolute;top:-3px;right:-3px;min-width:17px;height:17px;border-radius:9px;background:var(--vermelho);color:#fff;font-size:9px;font-weight:700;display:none;align-items:center;justify-content:center;border:2px solid var(--azul);padding:0 4px;animation:bPop .3s ease}
+.nBadge.vis{display:flex}
+@keyframes bPop{0%{transform:scale(0)}70%{transform:scale(1.2)}100%{transform:scale(1)}}
+.aTabs{display:flex}
+.aTab{flex:1;padding:9px 6px;text-align:center;color:rgba(255,255,255,.5);font-size:12px;font-weight:500;cursor:pointer;border:none;border-bottom:2px solid transparent;background:none;font-family:'Montserrat',sans-serif}
+.aTab.on{color:#fff;border-bottom-color:var(--laranja)}
+.accInfo{background:var(--azulClaro);padding:16px 16px 20px;flex-shrink:0}
+.accNum{font-size:11px;color:var(--txtL);margin-bottom:10px;font-weight:500}
+.pixLimit{display:flex;align-items:center;gap:8px;background:var(--branco);border-radius:8px;padding:10px 12px;margin-bottom:14px;cursor:pointer;border:none;width:100%;text-align:left;font-family:'Montserrat',sans-serif}
+.pixLimit:active{box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.pixLimitIco{width:32px;height:32px;border-radius:50%;background:rgba(0,51,102,.08);color:var(--azul);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.pixLimitTxt{flex:1;min-width:0}
+.pixLimitT{font-size:12px;font-weight:700;color:var(--txt)}
+.pixLimitD{font-size:10px;color:var(--txtL);margin-top:1px}
+.pixLimitArrow{color:var(--txtL);font-size:12px;flex-shrink:0}
+.balSec{margin-top:4px}
+.balLb{font-size:11px;color:var(--txtL);font-weight:500;display:flex;align-items:center;gap:6px;margin-bottom:3px}
+.balEye{cursor:pointer;font-size:14px;color:var(--txtL)}
+.balVal{font-size:32px;font-weight:800;color:var(--txt)}
+.balVal.hide{letter-spacing:3px;font-size:28px}
+.mScroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;min-height:0}
+.mScroll::-webkit-scrollbar{display:none}
+.qAct{padding:16px 14px 12px}
+.qGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.qBtn{background:var(--branco);border:none;border-radius:10px;padding:14px 6px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px;box-shadow:0 1px 3px rgba(0,0,0,.05)}
+.qBtn:active{transform:scale(.96)}
+.qIco{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px}
+.qIco.o{background:rgba(247,148,29,.1);color:var(--laranja)}
+.qIco.b{background:rgba(0,51,102,.08);color:var(--azul)}
+.qIco.g{background:rgba(46,204,64,.1);color:var(--verde)}
+.qIco.r{background:rgba(231,76,60,.1);color:var(--vermelho)}
+.qIco.p{background:rgba(142,68,173,.1);color:#8e44ad}
+.qIco.t{background:rgba(0,150,136,.1);color:#009688}
+.qLbl{font-family:'Montserrat',sans-serif;font-size:10.5px;font-weight:600;color:var(--txt);text-align:center;line-height:1.3}
+.svcSec{padding:0 14px 14px}
+.svcT{font-size:15px;font-weight:700;color:var(--txt);margin-bottom:10px}
+.svcList{display:flex;flex-direction:column;gap:1px}
+.svcI{background:var(--branco);padding:14px 14px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;border:none;width:100%;font-family:'Montserrat',sans-serif;text-align:left}
+.svcI:first-child{border-radius:8px 8px 0 0}
+.svcI:last-child{border-radius:0 0 8px 8px}
+.svcI:only-child{border-radius:8px}
+.svcI:active{background:#f0f0f0}
+.svcIL{display:flex;align-items:center;gap:12px}
+.svcII{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;background:rgba(0,51,102,.08);color:var(--azul);flex-shrink:0}
+.svcIT{font-size:14px;font-weight:600;color:var(--txt)}
+.svcIA{color:var(--txtL);font-size:12px;flex-shrink:0}
+.bNav{margin-top:auto;background:var(--branco);border-top:1px solid var(--borda);display:flex;padding:5px 0 calc(5px + var(--safe));flex-shrink:0}
+.nvI{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:5px 0;cursor:pointer;border:none;background:none;font-family:'Montserrat',sans-serif;color:var(--txtL)}
+.nvI.on{color:var(--azul)}
+.nvI i{font-size:17px}
+.nvI span{font-size:9px;font-weight:600}
+
+/* PIX */
+.pix{position:absolute;inset:0;background:var(--bg);z-index:50;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .3s cubic-bezier(.4,0,.2,1)}
+.pix.on{transform:translateX(0)}
+.pixH{background:var(--azul);padding:12px 14px;display:flex;align-items:center;gap:12px;flex-shrink:0;width:100%;z-index:2}
+.pixBk{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.08);border:none;color:#fff;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.pixHT{color:#fff;font-size:16px;font-weight:600}
+.pixBody{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;min-height:0;padding:16px 14px 24px}
+.pixBody::-webkit-scrollbar{display:none}
+.pixM{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:16px}
+.pixMC{background:var(--branco);border:2px solid transparent;border-radius:10px;padding:16px 8px;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:7px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+.pixMC:active{transform:scale(.97)}
+.pixMC.sel{border-color:var(--laranja);background:rgba(247,148,29,.03)}
+.pixMC.qr{border-color:transparent;background:linear-gradient(135deg,#f0f4ff,#e8eeff)}
+.pixMC.paste{border-color:transparent;background:linear-gradient(135deg,#f0faf4,#e8f5ee)}
+.pixMI{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:19px}
+.pixMI.qrI{background:rgba(99,102,241,.1);color:#6366f1}
+.pixMI.pasteI{background:rgba(0,150,136,.1);color:#009688}
+.pixMI.defI{background:rgba(0,51,102,.07);color:var(--azul)}
+.pixML{font-size:11.5px;font-weight:600;color:var(--txt);text-align:center;line-height:1.3}
+.pixMLSub{font-size:9px;color:var(--txtL);margin-top:1px}
+.rContacts{margin-bottom:16px}
+.cChip{display:inline-flex;align-items:center;gap:7px;background:var(--branco);padding:7px 12px 7px 7px;border-radius:20px;margin:0 5px 7px 0;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.05);border:none;font-family:'Montserrat',sans-serif}
+.cChip:active{transform:scale(.97)}
+.cAv{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:700;flex-shrink:0}
+.cNm{font-size:11px;font-weight:600;color:var(--txt)}
+
+/* Verificação de chave */
+.keyVerify{display:none;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;gap:12px}
+.keyVerify.on{display:flex}
+.kvSpinner{width:36px;height:36px;border:3px solid var(--borda);border-top-color:var(--laranja);border-radius:50%;animation:kvSpin .8s linear infinite}
+@keyframes kvSpin{to{transform:rotate(360deg)}}
+.kvText{font-size:13px;color:var(--txtL);font-weight:500}
+.kvSub{font-size:11px;color:#aaa}
+
+/* Form */
+.tForm{display:none;flex-direction:column;gap:14px}
+.tForm.on{display:flex}
+.fG{display:flex;flex-direction:column;gap:5px}
+.fLb{font-size:12px;font-weight:700;color:var(--txt)}
+.fIn{width:100%;padding:13px 14px;border:1.5px solid var(--borda);border-radius:8px;font-family:'Montserrat',sans-serif;font-size:14px;font-weight:500;color:var(--txt);background:var(--branco);outline:none;transition:border-color .2s}
+.fIn:focus{border-color:var(--laranja)}
+.fIn::placeholder{color:#bbb}
+.fIn:read-only{background:#f5f5f5;color:var(--txtL)}
+.fSel{width:100%;padding:13px 14px;border:1.5px solid var(--borda);border-radius:8px;font-family:'Montserrat',sans-serif;font-size:14px;font-weight:500;color:var(--txt);background:var(--branco);outline:none;cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23555' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center}
+.fSel:focus{border-color:var(--laranja)}
+.amtWrap{position:relative}
+.amtPre{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:18px;font-weight:700;color:var(--txt)}
+.amtIn{padding-left:42px!important;font-size:20px!important;font-weight:700!important}
+.contBtn{width:100%;padding:15px;border-radius:8px;background:var(--laranja);border:none;color:#fff;font-family:'Montserrat',sans-serif;font-size:15px;font-weight:700;cursor:pointer;margin-top:4px}
+.contBtn:active{transform:scale(.98)}
+.contBtn:disabled{background:#ccc;cursor:not-allowed}
+
+/* QR Scanner Overlay */
+.qrOverlay{position:absolute;inset:0;z-index:80;background:#000;display:flex;flex-direction:column;opacity:0;pointer-events:none;transition:opacity .3s}
+.qrOverlay.on{opacity:1;pointer-events:all}
+.qrOverlayH{background:var(--azul);padding:12px 14px;display:flex;align-items:center;gap:12px;flex-shrink:0}
+.qrOverlayH span{color:#fff;font-size:16px;font-weight:600;flex:1}
+.qrReaderWrap{flex:1;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}
+.qrReaderWrap #qr-reader{width:100%!important}
+.qrReaderWrap #qr-reader video{border-radius:0!important}
+.qrHint{position:absolute;bottom:20px;left:0;right:0;text-align:center;color:rgba(255,255,255,.7);font-size:12px;font-weight:500}
+.qrError{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:20px;text-align:center}
+.qrError i{font-size:40px;color:var(--vermelho)}
+.qrErrorT{color:#fff;font-size:14px;font-weight:600}
+.qrErrorD{color:rgba(255,255,255,.6);font-size:12px;line-height:1.4}
+
+/* Paste Modal */
+.pasteOverlay{position:absolute;inset:0;z-index:80;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s}
+.pasteOverlay.on{opacity:1;pointer-events:all}
+.pasteCard{background:#fff;border-radius:14px;width:88%;max-width:360px;overflow:hidden;transform:scale(.9);transition:transform .25s}
+.pasteOverlay.on .pasteCard{transform:scale(1)}
+.pasteHead{background:var(--azul);padding:14px 16px;color:#fff;font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:space-between}
+.pasteClose{background:rgba(255,255,255,.1);border:none;color:#fff;width:28px;height:28px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:12px}
+.pasteBody{padding:16px}
+.pasteTa{width:100%;height:120px;border:1.5px solid var(--borda);border-radius:8px;padding:12px;font-family:'Montserrat',sans-serif;font-size:13px;color:var(--txt);resize:none;outline:none}
+.pasteTa:focus{border-color:var(--laranja)}
+.pasteHint{font-size:10px;color:var(--txtL);margin-top:6px;line-height:1.4}
+.pasteBtn{width:100%;padding:13px;border-radius:8px;background:var(--laranja);border:none;color:#fff;font-family:'Montserrat',sans-serif;font-size:14px;font-weight:700;cursor:pointer;margin-top:12px}
+.pasteBtn:active{transform:scale(.98)}
+
+/* Confirm */
+.conf{position:absolute;inset:0;background:var(--bg);z-index:60;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .3s cubic-bezier(.4,0,.2,1)}
+.conf.on{transform:translateX(0)}
+.confBody{flex:1;overflow-y:auto;min-height:0;padding:16px 14px}
+.confBody::-webkit-scrollbar{display:none}
+.confC{background:var(--branco);border-radius:14px;padding:22px;box-shadow:0 2px 10px rgba(0,0,0,.05)}
+.confAD{text-align:center;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid #eee}
+.confAL{font-size:12px;color:var(--txtL);margin-bottom:6px}
+.confAV{font-size:34px;font-weight:800;color:var(--txt)}
+.confD{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px solid #f0f0f0}
+.confD:last-child{border:none}
+.confDL{font-size:12px;color:var(--txtL);flex-shrink:0}
+.confDV{font-size:12px;font-weight:600;color:var(--txt);text-align:right;max-width:55%;word-break:break-all}
+.confActs{padding:0 14px 20px;display:flex;flex-direction:column;gap:10px;flex-shrink:0}
+.confBtn{width:100%;padding:14px;border-radius:8px;font-family:'Montserrat',sans-serif;font-size:15px;font-weight:700;cursor:pointer;border:none}
+.confBtn.pri{background:var(--laranja);color:#fff}
+.confBtn.pri:active{transform:scale(.98)}
+.confBtn.sec{background:var(--branco);color:var(--txt);border:1.5px solid var(--borda)}
+
+/* Success */
+.succ{position:absolute;inset:0;background:var(--bg);z-index:70;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:36px 20px;opacity:0;pointer-events:none;transition:opacity .4s}
+.succ.on{opacity:1;pointer-events:all}
+.succI{width:72px;height:72px;border-radius:50%;background:var(--verde);color:#fff;font-size:32px;display:flex;align-items:center;justify-content:center;margin-bottom:20px;animation:sPop .5s cubic-bezier(.18,.89,.32,1.28)}
+@keyframes sPop{0%{transform:scale(0)}100%{transform:scale(1)}}
+.succT{font-size:20px;font-weight:700;color:var(--txt);margin-bottom:6px;text-align:center}
+.succS{font-size:13px;color:var(--txtL);text-align:center;margin-bottom:20px;line-height:1.5}
+.succA{font-size:30px;font-weight:800;color:var(--verde);margin-bottom:4px}
+.succTo{font-size:12px;color:var(--txtL);margin-bottom:30px;text-align:center}
+.succBtns{display:flex;flex-direction:column;gap:10px;width:100%;max-width:300px}
+.succBtn{width:100%;padding:14px;border-radius:8px;font-family:'Montserrat',sans-serif;font-size:14px;font-weight:700;cursor:pointer;border:none}
+.succBtn.pri{background:var(--azul);color:#fff}
+.succBtn.sec{background:var(--branco);color:var(--txt);border:1.5px solid var(--borda)}
+.succBtn:active{transform:scale(.98)}
+
+/* Destinatário */
+.destScreen{position:absolute;inset:0;background:var(--bg);z-index:190;display:flex;flex-direction:column;opacity:0;pointer-events:none;transition:opacity .4s}
+.destScreen.on{opacity:1;pointer-events:all}
+.destBody{flex:1;overflow-y:auto;min-height:0;padding:16px 14px}
+.destBody::-webkit-scrollbar{display:none}
+.destBalCard{background:var(--branco);border-radius:12px;padding:18px;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.destBalLb{font-size:11px;color:var(--txtL);margin-bottom:4px}
+.destBalVal{font-size:28px;font-weight:800;color:var(--txt)}
+.destBalBefore{font-size:12px;color:var(--txtL);margin-top:4px}
+.destBalBefore span{text-decoration:line-through;color:#999}
+.destNotifCard{background:var(--branco);border-radius:12px;padding:16px;margin-bottom:14px;box-shadow:0 2px 8px rgba(46,204,64,.15);border-left:4px solid var(--verde)}
+.destNotifIcon{width:44px;height:44px;border-radius:50%;background:rgba(46,204,64,.12);color:var(--verde);display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:10px}
+.destNotifTit{font-size:15px;font-weight:700;color:var(--txt);margin-bottom:4px}
+.destNotifDesc{font-size:12px;color:var(--txtL);line-height:1.4}
+.destNotifVal{font-size:26px;font-weight:800;color:var(--verde);margin-top:10px}
+.destNotifFrom{font-size:11px;color:var(--txtL);margin-top:2px}
+.destDetCard{background:var(--branco);border-radius:12px;padding:18px;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.destDetTitle{font-size:13px;font-weight:700;color:var(--txt);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.destDetTitle i{color:var(--azul);font-size:14px}
+.destCloseBtn{margin:14px;padding:14px;border-radius:8px;background:var(--azul);border:none;color:#fff;font-family:'Montserrat',sans-serif;font-size:14px;font-weight:700;cursor:pointer;flex-shrink:0}
+
+/* Push notif */
+.rNotif{position:absolute;top:0;left:0;right:0;z-index:200;background:linear-gradient(135deg,#1b8a4a,#2ecc40);color:#fff;padding:14px 14px;display:flex;align-items:center;gap:10px;transform:translateY(-100%);transition:transform .4s cubic-bezier(.4,0,.2,1);box-shadow:0 4px 20px rgba(0,0,0,.3)}
+.rNotif.show{transform:translateY(0)}
+.rNIcon{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.rNTxt{flex:1;min-width:0}
+.rNT{font-size:13px;font-weight:700}
+.rND{font-size:11px;opacity:.9;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rNClose{background:none;border:none;color:#fff;font-size:16px;cursor:pointer;padding:4px;opacity:.8;flex-shrink:0}
+
+/* Notif Modal */
+.nOverlay{position:absolute;inset:0;background:rgba(0,0,0,.45);z-index:150;display:flex;align-items:flex-end;justify-content:center;opacity:0;pointer-events:none;transition:opacity .25s}
+.nOverlay.on{opacity:1;pointer-events:all}
+.nModal{background:var(--branco);border-radius:18px 18px 0 0;width:100%;max-height:72%;overflow-y:auto;transform:translateY(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);padding-bottom:var(--safe)}
+.nOverlay.on .nModal{transform:translateY(0)}
+.nMHandle{width:36px;height:4px;border-radius:2px;background:#ddd;margin:10px auto 0}
+.nMHead{display:flex;align-items:center;justify-content:space-between;padding:14px 18px 10px}
+.nMT{font-size:17px;font-weight:700;color:var(--txt)}
+.nMClose{width:30px;height:30px;border-radius:50%;background:#f0f0f0;border:none;font-size:13px;color:var(--txtL);cursor:pointer;display:flex;align-items:center;justify-content:center}
+.nList{padding:0 14px 18px;display:flex;flex-direction:column;gap:7px}
+.nItem{display:flex;gap:10px;padding:12px;border-radius:10px;background:#f8f9fa;animation:nSlide .25s ease}
+@keyframes nSlide{0%{opacity:0;transform:translateY(8px)}100%{opacity:1;transform:translateY(0)}}
+.nIIco{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.nIIco.sent{background:rgba(247,148,29,.1);color:var(--laranja)}
+.nIIco.recv{background:rgba(46,204,64,.1);color:var(--verde)}
+.nICont{flex:1;min-width:0}
+.nITit{font-size:12px;font-weight:700;color:var(--txt);margin-bottom:1px}
+.nIDesc{font-size:11px;color:var(--txtL);line-height:1.35}
+.nITime{font-size:9px;color:#aaa;margin-top:3px}
+.nEmpty{text-align:center;padding:36px 16px;color:var(--txtL);font-size:13px}
+.nEmpty i{font-size:36px;margin-bottom:10px;display:block;color:#ddd}
+
+/* Extrato */
+.extScreen{position:absolute;inset:0;background:var(--bg);z-index:55;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .3s cubic-bezier(.4,0,.2,1)}
+.extScreen.on{transform:translateX(0)}
+.extBody{flex:1;overflow-y:auto;min-height:0;padding:16px 14px}
+.extBody::-webkit-scrollbar{display:none}
+.extCard{background:var(--branco);border-radius:12px;padding:18px;margin-bottom:14px;box-shadow:0 1px 4px rgba(0,0,0,.04)}
+.extCardT{font-size:14px;font-weight:700;color:var(--txt);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.extCardT i{color:var(--azul);font-size:14px}
+.extItem{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:1px solid #f0f0f0}
+.extItem:last-child{border:none}
+.extIL{flex:1;min-width:0}
+.extILTit{font-size:13px;font-weight:600;color:var(--txt)}
+.extILDesc{font-size:11px;color:var(--txtL);margin-top:1px}
+.extIR{text-align:right;flex-shrink:0}
+.extIRVal{font-size:14px;font-weight:700}
+.extIRVal.out{color:var(--vermelho)}
+.extIRVal.in{color:var(--verde)}
+.extIRDate{font-size:10px;color:#aaa;margin-top:2px}
+.extShareBtn{width:32px;height:32px;border-radius:50%;background:#25d366;border:none;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.extShareBtn:active{opacity:.7}
+
+.toast{position:absolute;top:18px;left:50%;transform:translateX(-50%) translateY(-100px);background:#333;color:#fff;padding:10px 20px;border-radius:8px;font-size:12px;font-weight:500;z-index:300;transition:transform .3s cubic-bezier(.4,0,.2,1);white-space:nowrap;max-width:88%;text-align:center}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.toast.err{background:var(--vermelho)}
+.toast.ok{background:var(--verde)}
+.btnLoad{position:relative;pointer-events:none;opacity:.8}
+.btnLoad::after{content:'';position:absolute;width:18px;height:18px;border:2px solid transparent;border-top-color:#fff;border-radius:50%;animation:sp .6s linear infinite;right:14px;top:50%;transform:translateY(-50%)}
+@keyframes sp{to{transform:translateY(-50%) rotate(360deg)}}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+<div class="toast" id="toast"></div>
+<div class="rNotif" id="rNotif"><div class="rNIcon"><i class="fas fa-arrow-down"></i></div><div class="rNTxt"><div class="rNT">Voce recebeu um Pix!</div><div class="rND" id="rNotifDesc">-</div></div><button class="rNClose" id="rNotifClose"><i class="fas fa-times"></i></button></div>
+
+<!-- LOGIN -->
+<div class="login" id="loginScr">
+  <div class="loginBg">
+    <svg class="loginFig" viewBox="0 0 200 300" fill="none"><ellipse cx="100" cy="150" rx="55" ry="95" fill="rgba(255,255,255,.3)"/><path d="M60 80Q100 20 140 80Q160 130 140 200Q120 260 100 280Q80 260 60 200Q40 130 60 80Z" fill="rgba(255,255,255,.15)" stroke="rgba(255,255,255,.2)" stroke-width="1"/><path d="M140 80Q180 60 190 100Q200 140 170 160Q140 180 120 200Q100 220 80 250" fill="none" stroke="rgba(247,148,29,.25)" stroke-width="3" stroke-linecap="round"><animate attributeName="d" dur="4s" repeatCount="indefinite" values="M140 80Q180 60 190 100Q200 140 170 160Q140 180 120 200Q100 220 80 250;M140 85Q175 70 185 105Q195 145 165 155Q135 175 115 195Q95 215 75 245;M140 80Q180 60 190 100Q200 140 170 160Q140 180 120 200Q100 220 80 250"/></path></svg>
+    <svg class="loginFit" viewBox="0 0 200 400" fill="none"><path d="M100 0Q140 40 120 80Q100 120 130 160Q160 200 120 240Q80 280 110 320Q140 360 100 400" fill="none" stroke="rgba(247,148,29,.4)" stroke-width="2" stroke-linecap="round"><animate attributeName="d" dur="5s" repeatCount="indefinite" values="M100 0Q140 40 120 80Q100 120 130 160Q160 200 120 240Q80 280 110 320Q140 360 100 400;M100 0Q130 50 110 90Q90 130 120 170Q150 210 110 250Q70 290 100 330Q130 370 90 400;M100 0Q140 40 120 80Q100 120 130 160Q160 200 120 240Q80 280 110 320Q140 360 100 400"/></path></svg>
+  </div>
+  <div class="cpfDropdown" id="cpfDrop"><div class="cpfDropCard"><div class="cpfDropHead"><span>Selecionar usuario</span><button class="cpfDropClose" id="cpfDropClose"><i class="fas fa-times"></i></button></div><div class="cpfDropList" id="cpfDropList"></div></div></div>
+  <div class="loginC">
+    <button class="loginX" id="loginXBtn"><i class="fas fa-times"></i></button>
+    <div class="loginLogo"><svg viewBox="0 0 120 40" fill="none"><rect x="0" y="4" width="32" height="32" rx="4" fill="#F7941D"/><text x="6" y="27" font-family="Montserrat" font-weight="800" font-size="20" fill="#fff">C</text><text x="38" y="28" font-family="Montserrat" font-weight="700" font-size="22" fill="#fff" letter-spacing="2">CAIXA</text></svg></div>
+    <p class="loginGreet">Que bom ter você aqui novamente!</p>
+    <div class="loginCpfBox"><p class="loginCpfL">CPF</p><div class="loginCpfRow"><p class="loginCpfV" id="loginCpfVal">986.396.504-97</p><button class="loginCpfArrow" id="loginCpfBtn"><i class="fas fa-chevron-down"></i></button></div></div>
+    <a class="loginSelU" id="selU"><i class="fas fa-exchange-alt"></i> Selecionar usuario</a>
+    <button class="loginBio" id="bioBtn"><i class="fas fa-fingerprint"></i>Acessar com Biometria</button>
+    <div class="pinDots" id="pinD"><div class="pinD"></div><div class="pinD"></div><div class="pinD"></div><div class="pinD"></div><div class="pinD"></div><div class="pinD"></div></div>
+    <p class="loginErr" id="lErr"></p>
+    <div class="kpWrap"><p class="kpLabel">Servicos para voce</p><div class="kp" id="kp"><button class="kb" data-k="1">1</button><button class="kb" data-k="2">2</button><button class="kb" data-k="3">3</button><button class="kb" data-k="4">4</button><button class="kb" data-k="5">5</button><button class="kb" data-k="6">6</button><button class="kb" data-k="7">7</button><button class="kb" data-k="8">8</button><button class="kb" data-k="9">9</button><button class="kb empty"></button><button class="kb" data-k="0">0</button><button class="kb bs" data-k="bs"><i class="fas fa-delete-left"></i></button></div></div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main" id="mainScr">
+  <div class="mTopBar"><div class="mHTop"><div class="mLogo"><svg width="26" height="26" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="4" fill="#F7941D"/><text x="6" y="23" font-family="Montserrat" font-weight="800" font-size="20" fill="#fff">C</text></svg><span class="mLogoT">CAIXA</span></div><div class="mHA"><button class="mHBtn" id="bellBtn"><i class="fas fa-bell"></i><span class="nBadge" id="nBadge">0</span></button><button class="mHBtn"><i class="fas fa-user-circle"></i></button></div></div><div class="aTabs"><button class="aTab on">Poupanca</button><button class="aTab">Corrente</button></div></div>
+  <div class="accInfo">
+    <p class="accNum">Ag. 4823 CP. 860461109 - 4</p>
+    <button class="pixLimit" id="pixLimitBtn"><div class="pixLimitIco"><i class="fas fa-sliders"></i></div><div class="pixLimitTxt"><div class="pixLimitT">Controle seu limite Pix</div><div class="pixLimitD">Defina quanto pode enviar por dia</div></div><i class="fas fa-chevron-right pixLimitArrow"></i></button>
+    <div class="balSec"><div class="balLb">Saldo disponivel <i class="fas fa-eye balEye" id="balEye"></i></div><p class="balVal" id="balVal">R$ 2.500,00</p></div>
+  </div>
+  <div class="mScroll">
+    <div class="qAct"><div class="qGrid"><button class="qBtn" id="bPix"><div class="qIco o"><i class="fas fa-qrcode"></i></div><span class="qLbl">Fazer Pix</span></button><button class="qBtn" id="bPagar"><div class="qIco b"><i class="fas fa-barcode"></i></div><span class="qLbl">Pagar conta</span></button><button class="qBtn" id="bEmp"><div class="qIco g"><i class="fas fa-hand-holding-dollar"></i></div><span class="qLbl">Pegar emprestado</span></button><button class="qBtn" id="bRec"><div class="qIco p"><i class="fas fa-mobile-screen-button"></i></div><span class="qLbl">Recarga</span></button><button class="qBtn" id="bTransf"><div class="qIco t"><i class="fas fa-arrow-right-arrow-left"></i></div><span class="qLbl">Transferir</span></button><button class="qBtn" id="bSacar"><div class="qIco r"><i class="fas fa-money-bill-wave"></i></div><span class="qLbl">Sacar</span></button></div></div>
+    <div class="svcSec"><h2 class="svcT">Servicos</h2><div class="svcList"><button class="svcI" id="sMC"><div class="svcIL"><div class="svcII"><i class="fas fa-user"></i></div><span class="svcIT">Minha conta</span></div><i class="fas fa-chevron-right svcIA"></i></button><button class="svcI" id="sInv"><div class="svcIL"><div class="svcII"><i class="fas fa-chart-line"></i></div><span class="svcIT">Investimentos</span></div><i class="fas fa-chevron-right svcIA"></i></button><button class="svcI" id="sCart"><div class="svcIL"><div class="svcII"><i class="fas fa-credit-card"></i></div><span class="svcIT">Cartoes</span></div><i class="fas fa-chevron-right svcIA"></i></button><button class="svcI" id="sExt"><div class="svcIL"><div class="svcII"><i class="fas fa-receipt"></i></div><span class="svcIT">Extrato</span></div><i class="fas fa-chevron-right svcIA"></i></button></div></div>
+  </div>
+  <nav class="bNav"><button class="nvI on" data-n="0"><i class="fas fa-home"></i><span>Inicio</span></button><button class="nvI" data-n="1"><i class="fas fa-th-large"></i><span>Servicos</span></button><button class="nvI" data-n="2"><i class="fas fa-file-lines"></i><span>Extrato</span></button><button class="nvI" data-n="3"><i class="fas fa-credit-card"></i><span>Cartoes</span></button><button class="nvI" data-n="4"><i class="fas fa-ellipsis"></i><span>Mais</span></button></nav>
+</div>
+
+<!-- PIX -->
+<div class="pix" id="pixScr">
+  <div class="pixH"><button class="pixBk" id="pixBk"><i class="fas fa-arrow-left"></i></button><span class="pixHT">Pix</span></div>
+  <div class="pixBody">
+    <h3 class="svcT" style="margin-bottom:14px">Enviar com Pix</h3>
+    <div class="rContacts">
+      <div class="cChip" data-n="Maria Silva" data-k="maria@email.com" data-t="email" data-b="Nubank"><div class="cAv" style="background:#8B5CF6">MS</div><span class="cNm">Maria Silva</span></div>
+      <div class="cChip" data-n="Joao Santos" data-k="11999999999" data-t="telefone" data-b="Banco do Brasil"><div class="cAv" style="background:#1D4ED8">JS</div><span class="cNm">Joao Santos</span></div>
+      <div class="cChip" data-n="Ana Oliveira" data-k="123.456.789-00" data-t="cpf" data-b="Itau Unibanco"><div class="cAv" style="background:#0066B3">AO</div><span class="cNm">Ana Oliveira</span></div>
+    </div>
+    <div class="pixM">
+      <div class="pixMC qr" id="qrScanBtn"><div class="pixMI qrI"><i class="fas fa-camera"></i></div><span class="pixML">Escanear QR Code</span><span class="pixMLSub">Camera ou galeria</span></div>
+      <div class="pixMC paste" id="pasteBtn"><div class="pixMI pasteI"><i class="fas fa-paste"></i></div><span class="pixML">Colar chave Pix</span><span class="pixMLSub">Copie e cole</span></div>
+      <div class="pixMC" data-m="cpf"><div class="pixMI defI"><i class="fas fa-id-card"></i></div><span class="pixML">CPF/CNPJ</span></div>
+      <div class="pixMC" data-m="telefone"><div class="pixMI defI"><i class="fas fa-phone"></i></div><span class="pixML">Telefone</span></div>
+      <div class="pixMC" data-m="email"><div class="pixMI defI"><i class="fas fa-envelope"></i></div><span class="pixML">E-mail</span></div>
+      <div class="pixMC" data-m="chave"><div class="pixMI defI"><i class="fas fa-key"></i></div><span class="pixML">Chave aleatoria</span></div>
+    </div>
+    <div class="keyVerify" id="keyVerify"><div class="kvSpinner"></div><p class="kvText">Verificando chave Pix...</p><p class="kvSub">Consultando o Banco Central</p></div>
+    <div class="tForm" id="tForm">
+      <div class="fG"><label class="fLb" id="kLabel">Chave Pix</label><input type="text" class="fIn" id="kInput" placeholder="Digite a chave Pix" autocomplete="off"></div>
+      <div class="fG"><label class="fLb">Nome do destinatario</label><input type="text" class="fIn" id="rName" placeholder="Ex: Maria Silva"></div>
+      <div class="fG"><label class="fLb">Instituicao</label><select class="fSel" id="bankSel"><option value="">Selecione o banco</option><option value="CAIXA Economica Federal">CAIXA Economica Federal</option><option value="Nubank">Nubank</option><option value="Banco do Brasil">Banco do Brasil</option><option value="Itau Unibanco">Itau Unibanco</option><option value="Bradesco">Bradesco</option><option value="Santander">Santander</option><option value="Banco Inter">Banco Inter</option><option value="BTG Pactual">BTG Pactual</option><option value="C6 Bank">C6 Bank</option><option value="PagBank">PagBank</option><option value="Banco Original">Banco Original</option><option value="Mercado Pago">Mercado Pago</option><option value="Outra instituicao">Outra instituicao</option></select></div>
+      <div class="fG"><label class="fLb">Valor</label><div class="amtWrap"><span class="amtPre">R$</span><input type="text" class="fIn amtIn" id="aInput" placeholder="0,00" inputmode="decimal" autocomplete="off"></div></div>
+      <div class="fG"><label class="fLb">Mensagem (opcional)</label><input type="text" class="fIn" id="mInput" placeholder="Adicione uma mensagem" maxlength="80"></div>
+      <button class="contBtn" id="contBtn" disabled>Continuar</button>
+    </div>
+  </div>
+</div>
+
+<!-- QR SCANNER -->
+<div class="qrOverlay" id="qrOverlay">
+  <div class="qrOverlayH"><button class="pixBk" id="qrCloseBtn"><i class="fas fa-arrow-left"></i></button><span>Escanear QR Code</span></div>
+  <div class="qrReaderWrap"><div id="qr-reader"></div><p class="qrHint">Aponte a camera para o QR Code Pix</p></div>
+</div>
+
+<!-- PASTE MODAL -->
+<div class="pasteOverlay" id="pasteOverlay">
+  <div class="pasteCard">
+    <div class="pasteHead"><span>Colar chave Pix</span><button class="pasteClose" id="pasteCloseBtn"><i class="fas fa-times"></i></button></div>
+    <div class="pasteBody">
+      <textarea class="pasteTa" id="pasteTa" placeholder="Cole aqui a chave Pix ou o codigo QR Pix copiado..."></textarea>
+      <p class="pasteHint">Voce pode colar uma chave (CPF, telefone, e-mail, chave aleatoria) ou o codigo completo de um QR Code Pix.</p>
+      <button class="pasteBtn" id="pasteConfirmBtn">Verificar chave</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRM -->
+<div class="conf" id="confScr">
+  <div class="pixH"><button class="pixBk" id="confBk"><i class="fas fa-arrow-left"></i></button><span class="pixHT">Confirmar transferencia</span></div>
+  <div class="confBody"><div class="confC"><div class="confAD"><p class="confAL">Voce esta enviando</p><p class="confAV" id="cAmt">R$ 0,00</p></div><div class="confD"><span class="confDL">Para</span><span class="confDV" id="cName">-</span></div><div class="confD"><span class="confDL">Banco</span><span class="confDV" id="cBank">-</span></div><div class="confD"><span class="confDL">Chave</span><span class="confDV" id="cKey">-</span></div><div class="confD"><span class="confDL">Tipo</span><span class="confDV" id="cType">-</span></div><div class="confD"><span class="confDL">Conta origem</span><span class="confDV">Poupanca 860461109-4</span></div><div class="confD" id="cMsgRow" style="display:none"><span class="confDL">Mensagem</span><span class="confDV" id="cMsg">-</span></div></div></div>
+  <div class="confActs"><button class="confBtn pri" id="confSendBtn">Confirmar envio</button><button class="confBtn sec" id="confCancelBtn">Cancelar</button></div>
+</div>
+
+<!-- SUCCESS -->
+<div class="succ" id="succScr">
+  <div class="succI"><i class="fas fa-check"></i></div>
+  <h2 class="succT">Pix enviado!</h2>
+  <p class="succS">A transferencia foi realizada com sucesso</p>
+  <p class="succA" id="sAmt">R$ 0,00</p>
+  <p class="succTo" id="sTo">Para: -</p>
+  <div class="succBtns">
+    <button class="succBtn pri" id="sDestBtn"><i class="fas fa-eye" style="margin-right:6px"></i>Ver conta do destinatario</button>
+    <button class="succBtn sec" id="sBtn">Voltar ao inicio</button>
+  </div>
+</div>
+
+<!-- EXTRATO -->
+<div class="extScreen" id="extScr">
+  <div class="pixH"><button class="pixBk" id="extBk"><i class="fas fa-arrow-left"></i></button><span class="pixHT">Extrato</span></div>
+  <div class="extBody" id="extBody"></div>
+</div>
+
+<!-- DESTINATÁRIO -->
+<div class="destScreen" id="destScr">
+  <div class="destHeader pixH"><button class="pixBk" id="destBk"><i class="fas fa-arrow-left"></i></button><span class="pixHT" id="destHT">-</span></div>
+  <div class="destBody" id="destBody"></div>
+  <button class="destCloseBtn" id="destCloseBtn">Voltar ao meu aplicativo</button>
+</div>
+
+<!-- NOTIF MODAL -->
+<div class="nOverlay" id="nOverlay"><div class="nModal"><div class="nMHandle"></div><div class="nMHead"><span class="nMT">Notificacoes</span><button class="nMClose" id="nCloseBtn"><i class="fas fa-times"></i></button></div><div class="nList" id="nList"><div class="nEmpty"><i class="fas fa-bell-slash"></i>Nenhuma notificacao</div></div></div></div>
+</div>
+
+<script>
+const S={
+  balance:2500,balVis:true,pin:'123456',curPin:'',attempts:0,maxAtt:3,
+  method:null,td:{key:'',type:'',name:'',amount:0,msg:'',bank:''},
+  notifs:[],lastTransfer:null,
+  users:[
+    {id:0,name:'Gedson Costa',cpf:'986.396.504-97',ini:'GC',cor:'#003366'},
+    {id:1,name:'Maria Silva',cpf:'123.456.789-00',ini:'MS',cor:'#8B5CF6'},
+    {id:2,name:'Joao Santos',cpf:'987.654.321-00',ini:'JS',cor:'#1D4ED8'},
+    {id:3,name:'Ana Oliveira',cpf:'456.789.123-00',ini:'AO',cor:'#0066B3'}
+  ],
+  activeUser:0,
+  // Cada chave Pix tem uma conta com saldo (chave → {name, bank, balance})
+  pixRegistry:{},
+  transactions:[
+    {type:'in',title:'Pix recebido',desc:'De Carlos Mendes - Nubank',amount:150,date:'05/05/2026 14:32',bank:'Nubank'},
+    {type:'out',title:'Pix enviado',desc:'Para Loja ABC - Mercado Pago',amount:89.90,date:'04/05/2026 10:15',bank:'Mercado Pago'},
+    {type:'out',title:'Pagamento conta',desc:'Conta de luz',amount:187.50,date:'03/05/2026 09:00',bank:'CAIXA'},
+    {type:'in',title:'Pix recebido',desc:'De Ana Oliveira - Itau',amount:350,date:'02/05/2026 16:45',bank:'Itau Unibanco'},
+    {type:'out',title:'Pix enviado',desc:'Para Joao Santos - BB',amount:50,date:'01/05/2026 11:20',bank:'Banco do Brasil'}
+  ]
+};
+
+const $=s=>document.querySelector(s),$$=s=>document.querySelectorAll(s);
+const loginScr=$('#loginScr'),mainScr=$('#mainScr'),pixScr=$('#pixScr'),
+      confScr=$('#confScr'),succScr=$('#succScr'),extScr=$('#extScr'),
+      destScr=$('#destScr'),nOverlay=$('#nOverlay'),rNotif=$('#rNotif'),
+      nBadge=$('#nBadge'),toast=$('#toast'),cpfDrop=$('#cpfDrop'),
+      qrOverlay=$('#qrOverlay'),pasteOverlay=$('#pasteOverlay');
+
+function fmt(v){return v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'})}
+function now(){const d=new Date();return d.getHours().toString().padStart(2,'0')+':'+d.getMinutes().toString().padStart(2,'0')}
+function today(){const d=new Date();return d.getDate().toString().padStart(2,'0')+'/'+(d.getMonth()+1).toString().padStart(2,'0')+'/'+d.getFullYear()}
+function showToast(m,t=''){toast.textContent=m;toast.className='toast '+(t||'')+' show';setTimeout(()=>toast.classList.remove('show'),2800)}
+function upBal(){if(S.balVis){$('#balVal').textContent=fmt(S.balance);$('#balVal').classList.remove('hide')}else{$('#balVal').textContent='R$ \u2022\u2022\u2022\u2022';$('#balVal').classList.add('hide')}}
+
+/* ===== REGISTRO PIX SIMULADO ===== */
+function getPixAccount(key){
+  const k=key.trim().toLowerCase();
+  if(!S.pixRegistry[k]){
+    // Cria conta simulada com saldo aleatório para essa chave
+    S.pixRegistry[k]={balance:Math.floor(Math.random()*5000)+200,name:'',bank:'',key:key.trim()};
+  }
+  return S.pixRegistry[k];
+}
+
+/* ===== DETECTAR TIPO DE CHAVE ===== */
+function detectKeyType(key){
+  const k=key.trim();
+  if(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(k))return'chave';
+  if(/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(k))return'email';
+  if(/^\d{10,11}$/.test(k.replace(/\D/g,'')))return'telefone';
+  if(/^\d{3}\.?\d{3}\.?\d{3}-?\d{2}$/.test(k))return'cpf';
+  if(/^\d{2}\.?\d{3}\.?\d{3}\/?\d{4}-?\d{2}$/.test(k))return'cpf';
+  return'chave';
+}
+
+const typeLabels={cpf:'CPF/CNPJ',telefone:'Telefone',email:'E-mail',chave:'Chave aleatoria'};
+
+/* ===== PARSER DE PAYLOAD PIX (QR Code) ===== */
+function parsePixPayload(payload){
+  const r={key:'',name:'',amount:'',city:'',txId:''};
+  let i=0;
+  while(i<payload.length){
+    if(i+4>payload.length)break;
+    const id=payload.substr(i,2);
+    const len=parseInt(payload.substr(i+2,2));
+    if(isNaN(len)||i+4+len>payload.length)break;
+    const val=payload.substr(i+4,len);
+    if(id==='26'){
+      // Sub-campos do Merchant Account
+      let j=0;
+      while(j+4<=val.length){
+        const sId=val.substr(j,2);
+        const sLen=parseInt(val.substr(j+2,2));
+        if(isNaN(sLen)||j+4+sLen>val.length)break;
+        const sVal=val.substr(j+4,sLen);
+        if(sId==='01')r.key=sVal;
+        j+=4+sLen;
+      }
+    }else if(id==='54')r.amount=val;
+    else if(id==='59')r.name=val;
+    else if(id==='60')r.city=val;
+    else if(id==='62'){
+      let j=0;
+      while(j+4<=val.length){
+        const sId=val.substr(j,2);
+        const sLen=parseInt(val.substr(j+2,2));
+        if(isNaN(sLen)||j+4+sLen>val.length)break;
+        if(sId==='05')r.txId=val.substr(j+4,sLen);
+        j+=4+sLen;
+      }
+    }
+    i+=4+len;
+  }
+  return r;
+}
+
+/* ===== CPF DROPDOWN ===== */
+function renderCpfDrop(){
+  $('#loginCpfVal').textContent=S.users[S.activeUser].cpf;
+  $('#cpfDropList').innerHTML=S.users.map((u,i)=>`<button class="cpfDropItem ${i===S.activeUser?'sel':''}" data-idx="${i}"><div class="cpfDropAvatar" style="background:${u.cor}">${u.ini}</div><div class="cpfDropInfo"><div class="cpfDropName">${u.name}</div><div class="cpfDropCpf">${u.cpf}</div></div></button>`).join('');
+  $$('.cpfDropItem').forEach(b=>{b.onclick=()=>{S.activeUser=+b.dataset.idx;S.balance=2500;upBal();renderCpfDrop();cpfDrop.classList.remove('on');showToast('Usuario: '+S.users[S.activeUser].name,'ok')}});
+}
+ $('#loginCpfBtn').onclick=()=>cpfDrop.classList.add('on');
+ $('#selU').onclick=e=>{e.preventDefault();cpfDrop.classList.add('on')};
+ $('#cpfDropClose').onclick=()=>cpfDrop.classList.remove('on');
+cpfDrop.onclick=e=>{if(e.target===cpfDrop)cpfDrop.classList.remove('on')};
+
+/* ===== NOTIFICAÇÕES ===== */
+function addNotif(type,title,desc){S.notifs.unshift({type,title,desc,time:now(),date:today()});upBadge()}
+function upBadge(){const c=S.notifs.length;if(c>0){nBadge.classList.add('vis');nBadge.textContent=c>9?'9+':c;nBadge.style.animation='none';nBadge.offsetHeight;nBadge.style.animation=''}else nBadge.classList.remove('vis')}
+function renderNotifs(){if(!S.notifs.length){$('#nList').innerHTML='<div class="nEmpty"><i class="fas fa-bell-slash"></i>Nenhuma notificacao</div>';return}$('#nList').innerHTML=S.notifs.map(n=>`<div class="nItem"><div class="nIIco ${n.type==='sent'?'sent':'recv'}"><i class="fas ${n.type==='sent'?'fa-arrow-up':'fa-arrow-down'}"></i></div><div class="nICont"><div class="nITit">${n.title}</div><div class="nIDesc">${n.desc}</div><div class="nITime">${n.date} ${n.time}</div></div></div>`).join('')}
+ $('#bellBtn').onclick=()=>{renderNotifs();nOverlay.classList.add('on')};
+ $('#nCloseBtn').onclick=()=>nOverlay.classList.remove('on');
+nOverlay.onclick=e=>{if(e.target===nOverlay)nOverlay.classList.remove('on')};
+ $('#rNotifClose').onclick=()=>rNotif.classList.remove('show');
+
+/* ===== LOGIN ===== */
+function upDots(){$$('.pinD').forEach((d,i)=>d.classList.toggle('on',i<S.curPin.length))}
+function kp(k){
+  if(S.attempts>=S.maxAtt)return;
+  if(k==='bs'){S.curPin=S.curPin.slice(0,-1);$('#lErr').textContent='';upDots();return}
+  if(S.curPin.length>=6)return;
+  S.curPin+=k;upDots();
+  if(S.curPin.length===6)setTimeout(()=>{
+    if(S.curPin===S.pin){loginScr.style.transition='opacity .45s,transform .45s';loginScr.style.opacity='0';loginScr.style.transform='scale(1.04)';setTimeout(()=>{loginScr.style.display='none';mainScr.classList.add('on')},450)}
+    else{S.attempts++;$('#pinD').classList.add('pinErr');setTimeout(()=>$('#pinD').classList.remove('pinErr'),400);if(S.attempts>=S.maxAtt){$('#lErr').textContent='Tentativas excedidas.';showToast('Conta bloqueada','err')}else $('#lErr').textContent=`Senha incorreta. ${S.maxAtt-S.attempts} tentativa(s).`;S.curPin='';upDots()}
+  },180);
+}
+ $('#kp').onclick=e=>{const b=e.target.closest('.kb');if(b&&!b.classList.contains('empty'))kp(b.dataset.k)};
+ $('#bioBtn').onclick=()=>{S.curPin=S.pin;upDots();setTimeout(()=>{loginScr.style.transition='opacity .45s,transform .45s';loginScr.style.opacity='0';loginScr.style.transform='scale(1.04)';setTimeout(()=>{loginScr.style.display='none';mainScr.classList.add('on')},450)},250)};
+ $('#loginXBtn').onclick=()=>showToast('Nao e possivel fechar');
+document.onkeydown=e=>{if(loginScr.style.display!=='none'){if(e.key>='0'&&e.key<='9')kp(e.key);else if(e.key==='Backspace')kp('bs')}};
+
+/* ===== MAIN ===== */
+ $('#balEye').onclick=()=>{S.balVis=!S.balVis;$('#balEye').className='fas balEye '+(S.balVis?'fa-eye':'fa-eye-slash');upBal()};
+ $('#pixLimitBtn').onclick=()=>showToast('Limite Pix: R$ 5.000,00/dia','ok');
+ $$('.nvI').forEach(b=>b.onclick=()=>{$$('.nvI').forEach(n=>n.classList.remove('on'));b.classList.add('on');if(b.dataset.n==='2')openExt()});
+ $$('.aTab').forEach(t=>t.onclick=()=>{$$('.aTab').forEach(x=>x.classList.remove('on'));t.classList.add('on')});
+
+/* ===== ABRIR PIX ===== */
+function openPix(){
+  S.method=null;$$('.pixMC').forEach(c=>c.classList.remove('sel'));
+  $('#tForm').classList.remove('on');$('#keyVerify').classList.remove('on');
+  $('#kInput').value='';$('#kInput').removeAttribute('readonly');
+  $('#rName').value='';$('#bankSel').value='';$('#aInput').value='';$('#mInput').value='';
+  $('#contBtn').disabled=true;
+  pixScr.classList.add('on');$('.pixBody').scrollTop=0;
+}
+ $('#bPix').onclick=openPix;$('#bTransf').onclick=openPix;
+ $('#bPagar').onclick=()=>showToast('Pagamento em desenvolvimento');
+ $('#bEmp').onclick=()=>showToast('Emprestimo em desenvolvimento');
+ $('#bRec').onclick=()=>showToast('Recarga em desenvolvimento');
+ $('#bSacar').onclick=()=>showToast('Saque em desenvolvimento');
+ $('#sMC').onclick=()=>showToast('Minha conta em desenvolvimento');
+ $('#sInv').onclick=()=>showToast('Investimentos em desenvolvimento');
+ $('#sCart').onclick=()=>showToast('Cartoes em desenvolvimento');
+ $('#sExt').onclick=openExt;
+ $('#pixBk').onclick=()=>pixScr.classList.remove('on');
+
+/* ===== MÉTODOS DE CHAVE ===== */
+function showVerifyThenForm(key,name,bank,type,readOnly){
+  // Esconder métodos, mostrar verificação
+  $$('.pixMC').forEach(c=>c.classList.remove('sel'));
+  $('#keyVerify').classList.add('on');
+  $('#tForm').classList.remove('on');
+
+  setTimeout(()=>{
+    $('#keyVerify').classList.remove('on');
+    // Preencher formulário
+    if(readOnly)$('#kInput').setAttribute('readonly',true);
+    else $('#kInput').removeAttribute('readonly');
+    $('#kInput').value=key;
+    $('#kLabel').textContent=typeLabels[type]||'Chave Pix';
+    if(name)$('#rName').value=name;
+    if(bank)$('#bankSel').value=bank;
+    S.method=type;
+    $('#tForm').classList.add('on');
+    valForm();
+    setTimeout(()=>$('#rName').scrollIntoView({behavior:'smooth',block:'center'}),100);
+  },1500);
+}
+
+ $$('.pixMC[data-m]').forEach(c=>c.onclick=()=>{
+  $$('.pixMC').forEach(x=>x.classList.remove('sel'));c.classList.add('sel');
+  S.method=c.dataset.m;
+  const labels={cpf:{l:'CPF',p:'000.000.000-00'},telefone:{l:'Telefone',p:'(00) 00000-0000'},email:{l:'E-mail',p:'email@exemplo.com'},chave:{l:'Chave aleatoria',p:'00000000-0000-0000-0000-000000000000'}};
+  const cfg=labels[S.method];
+  $('#kInput').value='';$('#kInput').removeAttribute('readonly');
+  $('#kLabel').textContent=cfg.l;$('#kInput').placeholder=cfg.p;
+  $('#rName').value='';$('#bankSel').value='';
+  $('#tForm').classList.add('on');$('#keyVerify').classList.remove('on');
+  valForm();
+});
+
+/* ===== CONTATOS RÁPIDOS ===== */
+ $$('.cChip').forEach(ch=>ch.onclick=()=>{
+  $$('.pixMC').forEach(x=>x.classList.remove('sel'));
+  const key=ch.dataset.k,name=ch.dataset.n,bank=ch.dataset.b,type=ch.dataset.t;
+  showVerifyThenForm(key,name,bank,type,true);
+});
+
+/* ===== ESCANEAR QR CODE ===== */
+let qrScanner=null;
+ $('#qrScanBtn').onclick=()=>{
+  qrOverlay.classList.add('on');
+  if(typeof Html5Qrcode==='undefined'){
+    $('#qr-reader').innerHTML='<div class="qrError"><i class="fas fa-exclamation-triangle"></i><p class="qrErrorT">Camera indisponivel</p><p class="qrErrorD">Use a opcao "Colar chave Pix" ou digite a chave manualmente.</p></div>';
+    return;
+  }
+  try{
+    qrScanner=new Html5Qrcode('qr-reader');
+    qrScanner.start(
+      {facingMode:'environment'},
+      {fps:10,qrbox:{width:250,height:250},aspectRatio:1},
+      onQrScanned,
+      ()=>{}
+    ).catch(err=>{
+      $('#qr-reader').innerHTML=`<div class="qrError"><i class="fas fa-exclamation-triangle"></i><p class="qrErrorT">Nao foi possivel acessar a camera</p><p class="qrErrorD">Verifique se permitiu o acesso a camera ou use "Colar chave Pix".</p></div>`;
+    });
+  }catch(e){
+    $('#qr-reader').innerHTML=`<div class="qrError"><i class="fas fa-exclamation-triangle"></i><p class="qrErrorT">Erro ao iniciar camera</p><p class="qrErrorD">Use "Colar chave Pix" como alternativa.</p></div>`;
+  }
+};
+
+function onQrScanned(text){
+  try{qrScanner.stop()}catch(e){}
+  qrOverlay.classList.remove('on');
+  // Verificar se é payload Pix
+  let key='',name='',amount='',type='';
+  if(text.includes('br.gov.bcb.pix')||text.startsWith('000201')){
+    const parsed=parsePixPayload(text);
+    key=parsed.key;name=parsed.name;amount=parsed.amount;
+    type=detectKeyType(key);
+  }else{
+    key=text.trim();
+    type=detectKeyType(key);
+  }
+  if(!key){showToast('QR Code nao contem chave Pix','err');return}
+  showVerifyThenForm(key,name,'',type,true);
+  if(amount){
+    // Formatar valor do payload
+    const numVal=parseFloat(amount);
+    if(!isNaN(numVal)&&numVal>0){
+      while(amount.length<3)amount='0'+amount;
+      $('#aInput').value=parseInt(amount.slice(0,-2)).toLocaleString('pt-BR')+','+amount.slice(-2);
+      valForm();
+    }
+  }
+}
+
+ $('#qrCloseBtn').onclick=()=>{
+  try{if(qrScanner)qrScanner.stop()}catch(e){}
+  qrOverlay.classList.remove('on');
+};
+
+/* ===== COLAR CHAVE ===== */
+ $('#pasteBtn').onclick=()=>{pasteOverlay.classList.add('on');$('#pasteTa').value='';$('#pasteTa').focus()};
+ $('#pasteCloseBtn').onclick=()=>pasteOverlay.classList.remove('on');
+pasteOverlay.onclick=e=>{if(e.target===pasteOverlay)pasteOverlay.classList.remove('on')};
+
+ $('#pasteConfirmBtn').onclick=()=>{
+  const raw=$('#pasteTa').value.trim();
+  if(!raw){showToast('Cole uma chave Pix','err');return}
+  pasteOverlay.classList.remove('on');
+
+  let key='',name='',amount='',type='';
+  // Verificar se é payload Pix completo
+  if(raw.includes('br.gov.bcb.pix')||raw.startsWith('000201')){
+    const parsed=parsePixPayload(raw);
+    key=parsed.key;name=parsed.name;amount=parsed.amount;
+    type=detectKeyType(key);
+  }else{
+    // Tratar como chave simples
+    key=raw;
+    type=detectKeyType(key);
+  }
+  if(!key){showToast('Chave invalida','err');return}
+  showVerifyThenForm(key,name,'',type,true);
+  if(amount){
+    const numVal=parseFloat(amount);
+    if(!isNaN(numVal)&&numVal>0){
+      while(amount.length<3)amount='0'+amount;
+      $('#aInput').value=parseInt(amount.slice(0,-2)).toLocaleString('pt-BR')+','+amount.slice(-2);
+      valForm();
+    }
+  }
+};
+
+/* ===== VALIDAÇÃO DO FORMULÁRIO ===== */
+ $('#aInput').oninput=e=>{let v=e.target.value.replace(/\D/g,'');if(!v){e.target.value='';valForm();return}while(v.length<3)v='0'+v;e.target.value=parseInt(v.slice(0,-2)).toLocaleString('pt-BR')+','+v.slice(-2);valForm()};
+ $('#kInput').oninput=valForm;$('#rName').oninput=valForm;$('#bankSel').onchange=valForm;
+function pAmt(s){if(!s)return 0;const n=parseFloat(s.replace(/\./g,'').replace(',','.'));return isNaN(n)?0:n}
+function valForm(){$('#contBtn').disabled=!($('#kInput').value.trim()&&$('#rName').value.trim()&&$('#bankSel').value&&pAmt($('#aInput').value)>0)}
+
+/* ===== CONTINUAR → CONFIRMAÇÃO ===== */
+ $('#contBtn').onclick=()=>{
+  const k=$('#kInput').value.trim(),n=$('#rName').value.trim(),a=pAmt($('#aInput').value),m=$('#mInput').value.trim(),b=$('#bankSel').value;
+  if(a>S.balance){showToast('Saldo insuficiente','err');return}
+  if(a<=0){showToast('Valor invalido','err');return}
+  $('#cAmt').textContent=fmt(a);$('#cName').textContent=n;$('#cBank').textContent=b;$('#cKey').textContent=k;$('#cType').textContent=typeLabels[S.method]||S.method;
+  if(m){$('#cMsgRow').style.display='flex';$('#cMsg').textContent=m}else $('#cMsgRow').style.display='none';
+  S.td={key:k,type:typeLabels[S.method]||S.method,name:n,amount:a,msg:m,bank:b};
+  confScr.classList.add('on');
+};
+ $('#confBk').onclick=()=>confScr.classList.remove('on');
+ $('#confCancelBtn').onclick=()=>confScr.classList.remove('on');
+
+/* ===== ENVIAR PIX (SIMULAÇÃO) ===== */
+ $('#confSendBtn').onclick=()=>{
+  const btn=$('#confSendBtn');btn.classList.add('btnLoad');btn.textContent='Enviando...';
+  setTimeout(()=>{
+    btn.classList.remove('btnLoad');btn.textContent='Confirmar envio';
+    const{key,type,name,amount,msg,bank}=S.td;
+
+    // 1. Obter/criar conta do destinatário no registro Pix
+    const destAcc=getPixAccount(key);
+    const saldoAntes=destAcc.balance;
+    if(name)destAcc.name=name;
+    if(bank)destAcc.bank=bank;
+
+    // 2. Descontar do remetente
+    S.balance-=amount;upBal();
+
+    // 3. ADICIONAR na conta do destinatário
+    destAcc.balance+=amount;
+    const saldoDepois=destAcc.balance;
+
+    // 4. Registrar transação
+    S.transactions.unshift({type:'out',title:'Pix enviado',desc:'Para '+name+' - '+bank,amount,date:today()+' '+now(),bank});
+
+    // 5. Notificações
+    addNotif('sent','Pix enviado','Voce enviou '+fmt(amount)+' para '+name+' ('+bank+')');
+    addNotif('recv','Pix recebido!','Voce recebeu '+fmt(amount)+' de '+S.users[S.activeUser].name);
+
+    // 6. Guardar dados para tela do destinatário
+    S.lastTransfer={name,amount,key,type,bank,saldoAntes,saldoDepois,fromName:S.users[S.activeUser].name,fromCpf:S.users[S.activeUser].cpf};
+
+    // 7. Fechar e mostrar sucesso
+    confScr.classList.remove('on');pixScr.classList.remove('on');
+    $('#sAmt').textContent=fmt(amount);
+    $('#sTo').textContent='Para: '+name+' ('+bank+')';
+    setTimeout(()=>succScr.classList.add('on'),350);
+  },2000);
+};
+
+/* ===== VER CONTA DO DESTINATÁRIO ===== */
+ $('#sDestBtn').onclick=()=>{
+  const t=S.lastTransfer;if(!t)return;
+  // Push notification
+  $('#rNotifDesc').textContent=fmt(t.amount)+' de '+t.fromName;
+  rNotif.classList.add('show');
+  setTimeout(()=>{rNotif.classList.remove('show');succScr.classList.remove('on');openDestScreen(t)},2000);
+};
+ $('#sBtn').onclick=()=>{succScr.classList.remove('on');rNotif.classList.remove('show')};
+
+/* ===== TELA DO DESTINATÁRIO ===== */
+function openDestScreen(t){
+  $('#destHT').textContent=t.bank||'Instituicao';
+  const displayName=t.name||'Destinatario';
+  $('#destBody').innerHTML=`
+    <div class="destNotifCard">
+      <div class="destNotifIcon"><i class="fas fa-arrow-down"></i></div>
+      <div class="destNotifTit">Voce recebeu um Pix!</div>
+      <div class="destNotifDesc">Transferencia recebida na sua conta ${t.bank||'bancaria'}.</div>
+      <div class="destNotifVal">+ ${fmt(t.amount)}</div>
+      <div class="destNotifFrom">De: ${t.fromName} (CAIXA Economica Federal)</div>
+    </div>
+    <div class="destBalCard">
+      <p class="destBalLb">Saldo disponivel - ${t.bank||'Conta'}</p>
+      <p class="destBalVal">${fmt(t.saldoDepois)}</p>
+      <p class="destBalBefore">Saldo anterior: <span>${fmt(t.saldoAntes)}</span></p>
+    </div>
+    <div class="destDetCard">
+      <div class="destDetTitle"><i class="fas fa-info-circle"></i> Detalhes da transferencia</div>
+      <div class="confD"><span class="confDL">Valor recebido</span><span class="confDV" style="color:var(--verde);font-weight:700">+ ${fmt(t.amount)}</span></div>
+      <div class="confD"><span class="confDL">Nome do remetente</span><span class="confDV">${t.fromName}</span></div>
+      <div class="confD"><span class="confDL">CPF do remetente</span><span class="confDV">${t.fromCpf}</span></div>
+      <div class="confD"><span class="confDL">Banco do remetente</span><span class="confDV">CAIXA Economica Federal</span></div>
+      <div class="confD"><span class="confDL">Chave recebida</span><span class="confDV">${t.key}</span></div>
+      <div class="confD"><span class="confDL">Tipo da chave</span><span class="confDV">${t.type}</span></div>
+      <div class="confD"><span class="confDL">Data/Hora</span><span class="confDV">${today()} ${now()}</span></div>
+      <div class="confD"><span class="confDL">Status</span><span class="confDV" style="color:var(--verde);font-weight:700"><i class="fas fa-check-circle"></i> Concluido</span></div>
+    </div>`;
+  destScr.classList.add('on');
+}
+ $('#destBk').onclick=()=>destScr.classList.remove('on');
+ $('#destCloseBtn').onclick=()=>destScr.classList.remove('on');
+
+/* ===== EXTRATO ===== */
+function shareSingle(tx){
+  const sign=tx.type==='out'?'-':'+';
+  window.open('https://wa.me/?text='+encodeURIComponent('*COMPROVANTE PIX - CAIXA*\n\n'+sign+' '+fmt(tx.amount)+'\n'+tx.title+'\n'+tx.desc+'\nData: '+tx.date+'\n\nConta origem: Poupanca Ag. 4823 CP. 860461109-4'),'_blank');
+  showToast('Enviando comprovante...','ok');
+}
+function openExt(){
+  let html='';
+  if(!S.transactions.length)html='<div class="nEmpty"><i class="fas fa-receipt"></i>Nenhuma movimentacao</div>';
+  else{
+    html+='<div class="extCard"><div class="extCardT"><i class="fas fa-list"></i> Movimentacoes</div>';
+    S.transactions.forEach((tx,i)=>{
+      const cls=tx.type==='out'?'out':'in',sign=tx.type==='out'?'-':'+';
+      html+=`<div class="extItem"><div class="extIL"><div class="extILTit">${tx.title}</div><div class="extILDesc">${tx.desc}</div></div><div class="extIR"><div class="extIRVal ${cls}">${sign} ${fmt(tx.amount)}</div><div class="extIRDate">${tx.date}</div></div><button class="extShareBtn" data-idx="${i}" title="WhatsApp"><i class="fab fa-whatsapp"></i></button></div>`;
+    });
+    html+='</div>';
+    const tO=S.transactions.filter(t=>t.type==='out').reduce((a,t)=>a+t.amount,0);
+    const tI=S.transactions.filter(t=>t.type==='in').reduce((a,t)=>a+t.amount,0);
+    html+=`<div class="extCard"><div class="extCardT"><i class="fas fa-calculator"></i> Resumo</div>
+      <div class="extItem"><div class="extIL"><div class="extILTit">Total recebido</div></div><div class="extIR"><div class="extIRVal in">+ ${fmt(tI)}</div></div></div>
+      <div class="extItem"><div class="extIL"><div class="extILTit">Total enviado</div></div><div class="extIR"><div class="extIRVal out">- ${fmt(tO)}</div></div></div>
+      <div class="extItem"><div class="extIL"><div class="extILTit" style="font-weight:700">Saldo atual</div></div><div class="extIR"><div class="extIRVal" style="color:var(--txt);font-size:15px">${fmt(S.balance)}</div></div></div></div>`;
+  }
+  $('#extBody').innerHTML=html;
+  $$('.extShareBtn').forEach(b=>{b.onclick=e=>{e.stopPropagation();shareSingle(S.transactions[+b.dataset.idx])}});
+  extScr.classList.add('on');
+}
+ $('#extBk').onclick=()=>extScr.classList.remove('on');
+
+/* ===== INIT ===== */
+upBal();upBadge();renderCpfDrop();
+</script>
+</body>
+</html>
